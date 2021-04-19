@@ -1,0 +1,26 @@
+def doOneProject(projectName, env, gitTag){
+	stage("${projectName}") {
+		sh "/data/sh/publish-java.sh ${projectName} ${env} ${gitTag}"
+		echo "${projectName}"
+	}
+	stage("${projectName}") {
+		echo "结束了${projectName}"
+	}
+}
+
+node(){   // 获取页面选择的内容
+	stage('pull code') {
+		git credentialsId: '2bf567dd-4b46-46a5-a049-539cf9651a7c', url: 'http://git.test.com/ellen/t-java.git'
+	}
+	def projectNameChoose="${publishAll}"   // 第一步显示出选择的
+
+	stage('show projectNameChoose') {
+		echo projectNameChoose
+		echo "${params.env}"
+	}
+	stage('run all') {
+		for (projectName in projectNameChoose.tokenize(',')){
+			doOneProject(projectName, "${params.env}", "${params.tag}")
+		}
+	}
+}

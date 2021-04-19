@@ -1,0 +1,11 @@
+node(){
+	stage('pull code') {
+		git credentialsId: '2bf567dd-4b46-46a5-a049-539cf9651a7c', url: 'http://git.test.com/ellen/t-node.git'
+		echo 'pull code'
+	}
+
+	stage('build and publish') {
+		sh "/data/sh/publish-vue.sh ${params.env} ${params.tag}"
+		echo 'build and publish'
+	}
+}
