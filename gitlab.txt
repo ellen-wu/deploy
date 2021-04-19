@@ -1,0 +1,57 @@
+centos7 gitlab安装，可以直接禁用防火墙
+
+1、安装依赖
+    yum -y install wget vim policycoreutils policycoreutils-python openssh-server openssh-clients postfix
+
+2、启动ssh服务，且开机启动
+    systemctl enable sshd && systemctl start sshd
+
+3、设置postfix开机启动，并启动
+    systemctl enable postfix && systemctl start postfix
+
+4. 开放ssh以及http服务，然后重新加载防火墙列表
+    firewall-cmd --add-service=ssh --permanent
+    firewall-cmd --add-service=http --permanent
+    firewall-cmd --reload
+
+5、下载gitlab，并安装
+    wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/gitlab-ce-12.4.2-ce.0.el7.x86_64.rpm
+
+    rpm ivh gitlab-ce-12.4.2-ce.0.el7.x86_64.rpm
+
+6、修改gitlab配置
+    vim /etc/gitlab/gitlab.rb
+        -- 修改 external_url
+        ## GitLab URL
+        ##! URL on which GitLab will be reachable.
+        ##! For more details on configuring external_url see:
+        ##! https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
+        external_url 'http://192.168.2.44'
+
+        -- 修改8080端口，这个端口太特殊了
+        unicorn['listen'] = '127.0.0.1'
+        unicorn['port'] = 28180
+
+        -- gitlab nginx的端口
+        nginx['listen_port'] = 9005
+
+7、重新配置gitlab及启动gitlab
+    gitlab-ctl reconfigure
+    gitlab-ctl start
+
+8、把端口添加到防火墙
+    firewall-cmd --zone=public --add-port=80/tcp --permanent
+    firewall-cmd --reload
+
+
+创建组、创建用户、创建用户
+
+
+
+
+# 老版本的gitlab需要自行汉化
+git clone https://gitlab.com/xhang/gitlab.git
+
+git diff v10.6.2 v10.6.2-zh > ../v10.6.2
+
+patch -d /opt/gitlab/embedded/service/gitlab-rails -p1 <  /tmp/v10.6.2

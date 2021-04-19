@@ -1,0 +1,70 @@
+mysql主从，一主一从，只是测试所以配置没做任何处理
+
+安装mysql，直接使用二进制包
+
+主库服务器
+    1、新增用户组以及用户
+        groupadd mysql
+        useradd mysql -s /sbin/nologin -g mysql -M
+    
+    2、解压初始化
+        tar xf mysql.xxx.tar.gz
+        mv mysql.xxx.tar.gz /usr/local/mysql
+        chown -R mysql.mysql /usr/local/mysql
+        /usr/local/mysql/bin/mysqld --initialize-insecure  --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
+
+    3、配置mysql
+        vim /etc/my.cnf
+            [mysqld]
+
+            basedir=/usr/local/mysql
+            datadir=/usr/local/mysql/data
+            socket=/tmp/mysql.sock
+
+            server_id=1
+            log-bin=mysql-bin
+
+    4、复制启动脚本并赋予执行权限，启动mysql
+        cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+        chmod +x /etc/init.d/mysqld
+        /etc/init.d/mysqld start
+
+    5、登录mysql，授权从库用户
+        grant replication slave on *.* to 'slave01'@'192.168.80.131' identified by '123456';
+        flush privileges;
+
+从库服务器
+    1、新增用户组以及用户
+        groupadd mysql
+        useradd mysql -s /sbin/nologin -g mysql -M
+    
+    2、解压初始化
+        tar xf mysql.xxx.tar.gz
+        mv mysql.xxx.tar.gz /usr/local/mysql
+        chown -R mysql.mysql /usr/local/mysql
+        /usr/local/mysql/bin/mysqld --initialize-insecure  --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
+
+    3、配置mysql
+        vim /etc/my.cnf
+            [mysqld]
+
+            basedir=/usr/local/mysql
+            datadir=/usr/local/mysql/data
+            socket=/tmp/mysql.sock
+
+            server_id=2
+            log-bin=mysql-bin
+
+    4、复制启动脚本并赋予执行权限，启动mysql
+        cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+        chmod +x /etc/init.d/mysqld
+        /etc/init.d/mysqld start
+
+    5、登录mysql，授权从库用户
+        # 设置同步主库的ip，同步的账户密码，从什么位置开始同步
+        change master to master_host='192.168.80.130',master_user='slave01',master_password='123456',master_log_file='mysql-bin.000001',master_log_pos=605;
+        start slave;
+
+        show slave status;
+        可以看到Slave_IO_Running和Slave_SQL_Running都是yes。说明同步成功了
+

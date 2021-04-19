@@ -1,0 +1,40 @@
+
+
+1、安装java
+    yum install java-1.8.0-openjdk* -y
+
+2、下载jekins并安装
+    http://mirrors.jenkins-ci.org/status.html
+    wget https://mirrors.tuna.tsinghua.edu.cn/jenkins/redhat-stable/jenkins-2.277.1-1.1.noarch.rpm
+
+3、修改端口以及用户
+    vim /etc/sysconfig/jenkins
+        JENKINS_USER="root"
+        JENKINS_PORT="18181"
+
+4、启动jenkins
+    systemctl start jenkins
+
+
+修改Jenkins插件下载地址
+Jenkins国外官方插件地址下载速度非常慢，所以可以修改为国内插件地址：
+Jenkins->Manage Jenkins->Manage Plugins，点击Available
+
+然后修改文件
+sed -i 's/http:\/\/updates.jenkins-ci.org\/download/https:\/\/mirrors.tuna.tsinghua.edu.cn\/jenkins/g' /var/lib/jenkins/updates/default.json && sed -i 's/http:\/\/www.google.com/https:\/\/www.baidu.com/g' /var/lib/jenkins/updates/default.json
+
+
+最后，Manage Plugins点击Advanced，把Update Site改为国内插件下载地址
+https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+
+
+需要安装的插件
+
+git, Credentials Binding, Role-based Authorization Strategy, Build With Parameters, Gitlab
+
+添加凭证，配置git地址以及凭证
+
+新建item，选择源码管理，填写git地址选择凭证，最后构建测试
+    构建成功后，查看项目是否存在
+        ls /var/lib/jenkins/workspace/
+    

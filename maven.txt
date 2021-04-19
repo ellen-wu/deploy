@@ -1,0 +1,42 @@
+
+# 下载maven二进制包
+wget https://mirrors.bfsu.edu.cn/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && mv -f apache-maven-3.6.3-bin.tar.gz /opt && cd /opt && tar xf apache-maven-3.6.3-bin.tar.gz && mv -f apache-maven-3.6.3 maven
+
+
+vim /etc/profile.d/maven.sh
+    export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+    export MAVEN_HOME=/opt/maven
+    export PATH=$PATH:$JAVA_HOME/bin:$MAVEN_HOME/bin
+
+
+添加Jenkins全局变量
+Manage Jenkins->Configure System->Global Properties ，添加三个全局变量
+JAVA_HOME、M2_HOME、PATH+EXTRA
+
+
+
+修改Maven的settings.xml
+mkdir /root/repo 创建本地仓库目录
+vi /opt/maven/conf/settings.xml
+本地仓库改为：/root/repo/
+<mirror>
+    <id>alimaven</id>
+    <mirrorOf>central</mirrorOf>
+    <name>aliyun maven</name>
+    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+</mirror>
+
+
+如果对java版本有需求，修改maven配置文件
+<profile>
+    <id>jdk-1.8</id>
+    <activation>
+        <activeByDefault>true</activeByDefault>
+        <jdk>1.8</jdk>
+    </activation>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+    </properties>
+</profile>
