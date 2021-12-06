@@ -50,6 +50,11 @@ AWK_S='$2'
 VERSION_FILE='.version'
 
 
+# 切换分支 2021-11 第一版 忘记加上分支切换
+cd ${BUILD_DIR} && git checkout ${GIT_TAG}
+
+
+
 # 公共组件 先mvn clean package 再 mvn install  这里包名是穿进来的 如果是每次构建都必须构建公共包 那么可以直接全部通过一个for循环构建安装
 if [ "${PACKAGE_NAME}" == 'component-parent' -o "${PACKAGE_NAME}" == 'component-commons' -o "${PACKAGE_NAME}" == 'component-domain' -o "${PACKAGE_NAME}" == 'component-feign-service' ];then
     echo '公共组件'
